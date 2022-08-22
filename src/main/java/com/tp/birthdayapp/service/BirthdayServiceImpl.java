@@ -44,9 +44,14 @@ public class BirthdayServiceImpl implements BasicService<Birthday> {
     }
 
     @Override
-    public ResponseEntity<String> delete(Birthday birthday) {
-        birthdayRepository.delete(birthday);
-        return ResponseEntity.status(HttpStatus.OK).body("Birthday has been deleted !");
+    public ResponseEntity<String> delete(Long id) {
+        Optional<Birthday> optionalBirthday = birthdayRepository.findById(id);
+        if(optionalBirthday.isPresent()){
+            birthdayRepository.delete(optionalBirthday.get());
+            return ResponseEntity.status(HttpStatus.OK).body("Birthday has been deleted !");
+        } else {
+            throw new NullPointerException("No user in databases");
+        }
     }
 
     public List<Birthday> findAllBirthdaysByAppUserId(Long id){

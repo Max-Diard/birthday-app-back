@@ -43,9 +43,14 @@ public class UserServiceImpl implements BasicService<AppUser> {
     }
 
     @Override
-    public ResponseEntity<String> delete(AppUser user) {
-        userRepository.delete(user);
-        return ResponseEntity.status(HttpStatus.OK).body("User has been deleted !");
+    public ResponseEntity<String> delete(Long id) {
+        Optional<AppUser> optionalAppUser = userRepository.findById(id);
+        if(optionalAppUser.isPresent()){
+            userRepository.delete(optionalAppUser.get());
+            return ResponseEntity.status(HttpStatus.OK).body("User has been deleted !");
+        } else {
+            throw new NullPointerException("No user in databases");
+        }
     }
 
     public Optional<AppUser> findByEmail(String email) {

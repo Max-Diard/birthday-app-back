@@ -11,5 +11,5 @@ public interface BasicService<S> {
     Optional<S> findById(Long id);
     ResponseEntity<String> create(S entity);
     ResponseEntity<String> update(S entity);
-    ResponseEntity<String> delete(S entity);
+    ResponseEntity<String> delete(Long id);
 }
