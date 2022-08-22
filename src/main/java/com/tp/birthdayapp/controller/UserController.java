@@ -22,27 +22,27 @@ public class UserController {
     };
 
     @GetMapping("/{id}")
-    Optional<AppUser> findUserById(@RequestParam Long id) {
+    Optional<AppUser> findUserById(@PathVariable Long id) {
         return userServiceImpl.findById(id);
     }
 
     @GetMapping("/{email}")
-    Optional<AppUser> findUserById(@RequestParam String email) {
+    Optional<AppUser> findUserById(@PathVariable String email) {
         return userServiceImpl.findByEmail(email);
     }
 
     @PostMapping("/add")
     ResponseEntity<String> createUser(@RequestBody AppUser user) {
-        return userServiceImpl.createUser(user);
+        return userServiceImpl.create(user);
     }
 
     @PutMapping("/update")
-    void updateUser(@RequestBody AppUser user) {
-        userServiceImpl.updateUser(user);
+    ResponseEntity<String> updateUser(@RequestBody AppUser user) {
+        return userServiceImpl.update(user);
     }
 
     @DeleteMapping("/delete")
-    void deleteUser(AppUser user) {
-        userServiceImpl.deleteUser(user);
+    ResponseEntity<String> deleteUser(AppUser user) {
+         return userServiceImpl.delete(user);
     }
 }

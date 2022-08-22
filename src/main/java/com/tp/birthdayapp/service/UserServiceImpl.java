@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements BasicService<AppUser> {
 
     @Autowired
     private UserRepository userRepository;
@@ -27,12 +27,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<AppUser> findByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
-
-    @Override
-    public ResponseEntity<String> createUser(AppUser user) {
+    public ResponseEntity<String> create(AppUser user) {
         if (!userRepository.existsByEmail(user.getEmail())) {
             userRepository.save(user);
             return ResponseEntity.status(HttpStatus.CREATED).body("User has been created !");
@@ -42,12 +37,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUser(AppUser user) {
+    public ResponseEntity<String> update(AppUser user) {
         userRepository.save(user);
+        return ResponseEntity.status(HttpStatus.OK).body("User has been updated !");
     }
 
     @Override
-    public void deleteUser(AppUser user) {
+    public ResponseEntity<String> delete(AppUser user) {
         userRepository.delete(user);
+        return ResponseEntity.status(HttpStatus.OK).body("User has been deleted !");
+    }
+
+    public Optional<AppUser> findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 }
