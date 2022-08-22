@@ -1,5 +1,6 @@
 package com.tp.birthdayapp.controller;
 
+import com.tp.birthdayapp.model.AppUser;
 import com.tp.birthdayapp.model.Birthday;
 import com.tp.birthdayapp.service.BirthdayServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,11 @@ public class BirthdayController {
     public List<Birthday> findAllBirthdays(){
         //Todo: A changer avec le bon utilisateur
         return birthdayServiceImpl.findAll();
+    }
+
+    @GetMapping("/users/{id}")
+    public List<Birthday> findAllBirthdaysByAppUserId(@PathVariable Long id){
+        return birthdayServiceImpl.findAllBirthdaysByAppUserId(id);
     }
 
     @GetMapping("/{id}")
