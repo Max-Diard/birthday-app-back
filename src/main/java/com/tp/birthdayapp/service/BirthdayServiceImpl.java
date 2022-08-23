@@ -3,7 +3,6 @@ package com.tp.birthdayapp.service;
 import com.tp.birthdayapp.model.AppUser;
 import com.tp.birthdayapp.model.Birthday;
 import com.tp.birthdayapp.repository.BirthdayRepository;
-import com.tp.birthdayapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +19,7 @@ public class BirthdayServiceImpl implements BasicService<Birthday> {
     private BirthdayRepository birthdayRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserServiceImpl userService;
 
     @Override
     public List<Birthday> findAll() {
@@ -28,7 +27,7 @@ public class BirthdayServiceImpl implements BasicService<Birthday> {
     }
 
     public Optional<Birthday> findBirthdayByUserIdAndBirthdayId(Long userId, Long birthdayId) {
-        AppUser appUser = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
+        AppUser appUser = this.userService.getAppUser(userId);
         return birthdayRepository.findBirthdayByAppUser_IdAndId(appUser.getId(), birthdayId);
     }
 
@@ -38,43 +37,62 @@ public class BirthdayServiceImpl implements BasicService<Birthday> {
         return ResponseEntity.status(HttpStatus.CREATED).body("Birthday has been created !");
     }
 
-    @Override
-    public ResponseEntity<String> update(Long id, Birthday birthday) {
-        Optional<Birthday> optionalBirthday = birthdayRepository.findById(id);
-        if (optionalBirthday.isPresent()) {
-            optionalBirthday.get().setFirstname(birthday.getFirstname());
-            optionalBirthday.get().setLastname(birthday.getLastname());
-            optionalBirthday.get().setDate(birthday.getDate());
-            birthdayRepository.save(optionalBirthday.get());
-            return ResponseEntity.status(HttpStatus.OK).body("User has been updated !");
-        }
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Birthday has not been updated !");
-    }
+    public ResponseEntity<String> updateWithUserIdAndBirthdayId(Long userId, Long birthdayId, Birthday birthday) {
+        AppUser appUser = this.userService.getAppUser(userId);
+        Birthday birthdayRepo = this.getBirthdayWithId(birthdayId);
 
-    @Override
-    public ResponseEntity<String> delete(Long id) {
-        Optional<Birthday> optionalBirthday = birthdayRepository.findById(id);
-        if(optionalBirthday.isPresent()){
-            birthdayRepository.delete(optionalBirthday.get());
-            return ResponseEntity.status(HttpStatus.OK).body("Birthday has been deleted !");
+        if (birthdayRepo.getAppUser().getId().equals(appUser.getId())) {
+            return this.update(birthdayRepo, birthday);
         } else {
-            throw new NullPointerException("No user in databases");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You can't update this birthday.");
         }
     }
 
-    public List<Birthday> findAllBirthdaysByAppUserId(Long id){
-        AppUser appUser = userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
+    @Override
+    public ResponseEntity<String> update(Birthday birthdayToUpdate, Birthday birthday) {
+        if (birthday.getFirstname() != null) {
+            birthdayToUpdate.setFirstname(birthday.getFirstname());
+        }
+        if (birthday.getLastname() != null) {
+            birthdayToUpdate.setLastname(birthday.getLastname());
+        }
+        if (birthday.getDate() != null) {
+            birthdayToUpdate.setDate(birthday.getDate());
+        }
+
+        birthdayRepository.save(birthdayToUpdate);
+        return ResponseEntity.status(HttpStatus.OK).body("Birthday has been updated !");
+    }
+
+    public ResponseEntity<String> deleteWithUserIdAndBirthdayId(Long userId, Long birthdayId) {
+        AppUser appUser = this.userService.getAppUser(userId);
+        Birthday birthdayRepo = this.getBirthdayWithId(birthdayId);
+
+        if (birthdayRepo.getAppUser().getId().equals(appUser.getId())) {
+            return this.delete(birthdayRepo);
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You can't delete this birthday.");
+        }
+    }
+
+    @Override
+    public ResponseEntity<String> delete(Birthday birthday) {
+        birthdayRepository.delete(birthday);
+        return ResponseEntity.status(HttpStatus.OK).body("Birthday has been deleted !");
+    }
+
+    public List<Birthday> findAllBirthdaysByAppUserId(Long id) {
+        AppUser appUser = this.userService.getAppUser(id);
         return birthdayRepository.findBirthdayByAppUser(appUser);
     }
-    
-    // TODO for DRY : Ecrire une méthode qui récupère le user et renvoie une 404 s'il n'est pas trouvé
 
     public ResponseEntity<String> createBirthdayWithAppUser(Long userId, Birthday birthday) {
-        Optional<AppUser> appUser = userRepository.findById(userId);
-        if (appUser.isPresent()) {
-            birthday.setAppUser(appUser.get());
-            return this.create(birthday);
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        AppUser appUser = this.userService.getAppUser(userId);
+        birthday.setAppUser(appUser);
+        return this.create(birthday);
+    }
+
+    private Birthday getBirthdayWithId(Long birthdayId) {
+        return this.birthdayRepository.findById(birthdayId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Birthday not found."));
     }
 }

@@ -16,12 +16,6 @@ public class BirthdayController {
     @Autowired
     private BirthdayServiceImpl birthdayServiceImpl;
 
-//    @GetMapping(value = {"", "/"})
-//    public List<Birthday> findAllBirthdays() {
-//        //Todo: A changer avec le bon utilisateur
-//        return birthdayServiceImpl.findAll();
-//    }
-
     @GetMapping("")
     public List<Birthday> findAllBirthdaysByAppUserId(@PathVariable Long userId) {
         return birthdayServiceImpl.findAllBirthdaysByAppUserId(userId);
@@ -37,13 +31,13 @@ public class BirthdayController {
         return birthdayServiceImpl.createBirthdayWithAppUser(userId, birthday);
     }
 
-    @PutMapping("/{id}")
-    ResponseEntity<String> updateBirthday(@PathVariable Long id, @RequestBody Birthday birthday) {
-        return birthdayServiceImpl.update(id, birthday);
+    @PutMapping("/{birthdayId}")
+    ResponseEntity<String> updateBirthday(@PathVariable Long userId, @PathVariable Long birthdayId, @RequestBody Birthday birthday) {
+        return birthdayServiceImpl.updateWithUserIdAndBirthdayId(userId, birthdayId, birthday);
     }
 
     @DeleteMapping("/{id}")
-    ResponseEntity<String> deleteBirthday(@PathVariable Long id) {
-        return birthdayServiceImpl.delete(id);
+    ResponseEntity<String> deleteBirthday(@PathVariable Long userId, @PathVariable Long id) {
+        return birthdayServiceImpl.deleteWithUserIdAndBirthdayId(userId, id);
     }
 }

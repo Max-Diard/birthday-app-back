@@ -16,10 +16,10 @@ public class UserController {
     @Autowired
     private UserServiceImpl userServiceImpl;
 
-    @GetMapping( "")
+    @GetMapping("")
     List<AppUser> findAllUsers() {
         return userServiceImpl.findAll();
-    };
+    }
 
     @GetMapping("/{id}")
     Optional<AppUser> findUserById(@PathVariable Long id) {
@@ -38,11 +38,11 @@ public class UserController {
 
     @PutMapping("/{id}")
     ResponseEntity<String> updateUser(@PathVariable Long id, @RequestBody AppUser user) {
-        return userServiceImpl.update(id, user);
+        return userServiceImpl.update(this.userServiceImpl.getAppUser(id), user);
     }
 
     @DeleteMapping("/{id}")
     ResponseEntity<String> deleteUser(@PathVariable Long id) {
-         return userServiceImpl.delete(id);
+        return userServiceImpl.delete(this.userServiceImpl.getAppUser(id));
     }
 }
