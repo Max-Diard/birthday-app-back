@@ -17,6 +17,19 @@ public class UserServiceImpl implements BasicService<AppUser> {
     @Autowired
     private UserRepository userRepository;
 
+    public ResponseEntity<String> login(String username, String password) {
+        if (this.findByUsername(username).isPresent()) {
+            if (password.equals(this.findByUsername(username).get().getPassword())) {
+                // C'est que c'est bon
+                return ResponseEntity.status(HttpStatus.OK).body("Authentication success !");
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials !");
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials !");
+        }
+    }
+
     @Override
     public List<AppUser> findAll() {
         return userRepository.findAll();
@@ -63,6 +76,10 @@ public class UserServiceImpl implements BasicService<AppUser> {
 
     public Optional<AppUser> findByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    public Optional<AppUser> findByUsername(String username) {
+        return  userRepository.findByUsername(username);
     }
 
     public AppUser getAppUser(Long userId) {
