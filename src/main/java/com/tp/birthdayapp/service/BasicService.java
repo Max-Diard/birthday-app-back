@@ -8,8 +8,7 @@ import java.util.Optional;
 public interface BasicService<S> {
 
     List<S> findAll();
-    Optional<S> findById(Long id);
     ResponseEntity<String> create(S entity);
-    ResponseEntity<String> update(S entity);
+    ResponseEntity<String> update(Long id, S entity);
     ResponseEntity<String> delete(Long id);
 }

@@ -16,14 +16,14 @@ public class UserController {
     @Autowired
     private UserServiceImpl userServiceImpl;
 
-    @GetMapping("/")
+    @GetMapping( "")
     List<AppUser> findAllUsers() {
         return userServiceImpl.findAll();
     };
 
     @GetMapping("/{id}")
     Optional<AppUser> findUserById(@PathVariable Long id) {
-        return userServiceImpl.findById(id);
+        return userServiceImpl.findByAppUserId(id);
     }
 
     @GetMapping("/{email}")
@@ -31,17 +31,17 @@ public class UserController {
         return userServiceImpl.findByEmail(email);
     }
 
-    @PostMapping("/add")
+    @PostMapping("")
     ResponseEntity<String> createUser(@RequestBody AppUser user) {
         return userServiceImpl.create(user);
     }
 
-    @PutMapping("/update")
-    ResponseEntity<String> updateUser(@RequestBody AppUser user) {
-        return userServiceImpl.update(user);
+    @PutMapping("/{id}")
+    ResponseEntity<String> updateUser(@PathVariable Long id, @RequestBody AppUser user) {
+        return userServiceImpl.update(id, user);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     ResponseEntity<String> deleteUser(@PathVariable Long id) {
          return userServiceImpl.delete(id);
     }

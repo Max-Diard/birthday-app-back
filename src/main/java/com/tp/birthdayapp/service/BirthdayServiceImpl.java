@@ -26,9 +26,12 @@ public class BirthdayServiceImpl implements BasicService<Birthday> {
         return birthdayRepository.findAll();
     }
 
-    @Override
-    public Optional<Birthday> findById(Long id) {
-        return birthdayRepository.findById(id);
+    public Optional<Birthday> findBirthdayByUserIdAndBirthdayId(Long userId, Long birthdayId) {
+        Optional<AppUser> appUser = userRepository.findById(userId);
+        if (appUser.isPresent()) {
+            return birthdayRepository.findBirthdayByAppUser_IdAndId(appUser.get().getId(), birthdayId);
+        }
+        return null;
     }
 
     @Override
@@ -38,9 +41,16 @@ public class BirthdayServiceImpl implements BasicService<Birthday> {
     }
 
     @Override
-    public ResponseEntity<String> update(Birthday birthday) {
-        birthdayRepository.save(birthday);
-        return ResponseEntity.status(HttpStatus.OK).body("Birthday has been updated !");
+    public ResponseEntity<String> update(Long id, Birthday birthday) {
+        Optional<Birthday> optionalBirthday = birthdayRepository.findById(id);
+        if (optionalBirthday.isPresent()) {
+            optionalBirthday.get().setFirstname(birthday.getFirstname());
+            optionalBirthday.get().setLastname(birthday.getLastname());
+            optionalBirthday.get().setDate(birthday.getDate());
+            birthdayRepository.save(optionalBirthday.get());
+            return ResponseEntity.status(HttpStatus.OK).body("User has been updated !");
+        }
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Birthday has not been updated !");
     }
 
     @Override

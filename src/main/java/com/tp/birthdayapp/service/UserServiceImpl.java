@@ -21,8 +21,7 @@ public class UserServiceImpl implements BasicService<AppUser> {
         return userRepository.findAll();
     }
 
-    @Override
-    public Optional<AppUser> findById(Long id) {
+    public Optional<AppUser> findByAppUserId(Long id) {
         return userRepository.findById(id);
     }
 
@@ -37,7 +36,15 @@ public class UserServiceImpl implements BasicService<AppUser> {
     }
 
     @Override
-    public ResponseEntity<String> update(AppUser user) {
+    public ResponseEntity<String> update(Long id, AppUser user) {
+        Optional<AppUser> optionalAppUser = userRepository.findById(id);
+        if(optionalAppUser.isPresent()){
+            optionalAppUser.get().setUsername(user.getUsername());
+            optionalAppUser.get().setPassword(user.getPassword());
+            optionalAppUser.get().setEmail(user.getEmail());
+            userRepository.save(optionalAppUser.get());
+            return ResponseEntity.status(HttpStatus.OK).body("User has been updated !");
+        }
         userRepository.save(user);
         return ResponseEntity.status(HttpStatus.OK).body("User has been updated !");
     }

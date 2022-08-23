@@ -10,39 +10,39 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/birthdays")
+@RequestMapping("/users/{userId}/birthdays")
 public class BirthdayController {
 
     @Autowired
     private BirthdayServiceImpl birthdayServiceImpl;
 
-    @GetMapping("/")
-    public List<Birthday> findAllBirthdays() {
-        //Todo: A changer avec le bon utilisateur
-        return birthdayServiceImpl.findAll();
+//    @GetMapping(value = {"", "/"})
+//    public List<Birthday> findAllBirthdays() {
+//        //Todo: A changer avec le bon utilisateur
+//        return birthdayServiceImpl.findAll();
+//    }
+
+    @GetMapping("")
+    public List<Birthday> findAllBirthdaysByAppUserId(@PathVariable Long userId) {
+        return birthdayServiceImpl.findAllBirthdaysByAppUserId(userId);
     }
 
-    @GetMapping("/users/{id}")
-    public List<Birthday> findAllBirthdaysByAppUserId(@PathVariable Long id) {
-        return birthdayServiceImpl.findAllBirthdaysByAppUserId(id);
+    @GetMapping("/{birthdayId}")
+    public Optional<Birthday> findBirthdayByUserIdAndBirthdayId(@PathVariable Long userId, @PathVariable Long birthdayId) {
+        return birthdayServiceImpl.findBirthdayByUserIdAndBirthdayId(userId, birthdayId);
     }
 
-    @GetMapping("/{id}")
-    public Optional<Birthday> findBirthdayById(@PathVariable Long id) {
-        return birthdayServiceImpl.findById(id);
-    }
-
-    @PostMapping("/add")
+    @PostMapping("")
     public ResponseEntity<String> createBirthday(@RequestBody Birthday birthday) {
         return birthdayServiceImpl.create(birthday);
     }
 
-    @PutMapping("/update")
-    ResponseEntity<String> updateBirthday(@RequestBody Birthday birthday) {
-        return birthdayServiceImpl.update(birthday);
+    @PutMapping("/{id}")
+    ResponseEntity<String> updateBirthday(@PathVariable Long id, @RequestBody Birthday birthday) {
+        return birthdayServiceImpl.update(id, birthday);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     ResponseEntity<String> deleteBirthday(@PathVariable Long id) {
         return birthdayServiceImpl.delete(id);
     }
