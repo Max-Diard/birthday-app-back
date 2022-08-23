@@ -3,6 +3,7 @@ package com.tp.birthdayapp.controller;
 import com.tp.birthdayapp.model.AppUser;
 import com.tp.birthdayapp.service.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,7 +34,12 @@ public class UserController {
 
     @PostMapping("")
     ResponseEntity<String> createUser(@RequestBody AppUser user) {
-        return userServiceImpl.create(user);
+        try {
+            return userServiceImpl.create(user);
+        } catch (NullPointerException e) {
+            System.out.println(e);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("All Fields must be completed.");
+        }
     }
 
     @PutMapping("/{id}")

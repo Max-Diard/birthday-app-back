@@ -3,6 +3,7 @@ package com.tp.birthdayapp.controller;
 import com.tp.birthdayapp.model.Birthday;
 import com.tp.birthdayapp.service.BirthdayServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,7 +29,11 @@ public class BirthdayController {
 
     @PostMapping("")
     public ResponseEntity<String> createBirthday(@PathVariable Long userId, @RequestBody Birthday birthday) {
-        return birthdayServiceImpl.createBirthdayWithAppUser(userId, birthday);
+        try {
+            return birthdayServiceImpl.createBirthdayWithAppUser(userId, birthday);
+        } catch (NullPointerException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("All Fields must be completed.");
+        }
     }
 
     @PutMapping("/{birthdayId}")

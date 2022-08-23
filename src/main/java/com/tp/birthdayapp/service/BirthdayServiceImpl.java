@@ -87,9 +87,13 @@ public class BirthdayServiceImpl implements BasicService<Birthday> {
     }
 
     public ResponseEntity<String> createBirthdayWithAppUser(Long userId, Birthday birthday) {
-        AppUser appUser = this.userService.getAppUser(userId);
-        birthday.setAppUser(appUser);
-        return this.create(birthday);
+        if (birthday.getFirstname() != null && birthday.getLastname() != null && birthday.getDate() != null) {
+            AppUser appUser = this.userService.getAppUser(userId);
+            birthday.setAppUser(appUser);
+            return this.create(birthday);
+        } else {
+            throw new NullPointerException("All fields must be completed !");
+        }
     }
 
     private Birthday getBirthdayWithId(Long birthdayId) {

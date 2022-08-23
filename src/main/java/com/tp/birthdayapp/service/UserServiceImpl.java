@@ -41,15 +41,20 @@ public class UserServiceImpl implements BasicService<AppUser> {
 
     @Override
     public ResponseEntity<String> create(AppUser user) {
-        if (!userRepository.existsByEmail(user.getEmail())) {
-            if (!userRepository.existsByUsername(user.getUsername())) {
-                userRepository.save(user);
-                return ResponseEntity.status(HttpStatus.CREATED).body("User has been created !");
+
+        if (user.getUsername() != null && user.getPassword() != null && user.getEmail() != null) {
+            if (!userRepository.existsByEmail(user.getEmail())) {
+                if (!userRepository.existsByUsername(user.getUsername())) {
+                    userRepository.save(user);
+                    return ResponseEntity.status(HttpStatus.CREATED).body("User has been created !");
+                } else {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This username already taken !");
+                }
             } else {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This username already taken !");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This email already exists !");
             }
         } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("This email already exists !");
+            throw new NullPointerException("Can't be null");
         }
     }
 
