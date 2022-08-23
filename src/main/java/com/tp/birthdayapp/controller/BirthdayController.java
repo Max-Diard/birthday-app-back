@@ -33,8 +33,8 @@ public class BirthdayController {
     }
 
     @PostMapping("")
-    public ResponseEntity<String> createBirthday(@RequestBody Birthday birthday) {
-        return birthdayServiceImpl.create(birthday);
+    public ResponseEntity<String> createBirthday(@PathVariable Long userId, @RequestBody Birthday birthday) {
+        return birthdayServiceImpl.createBirthdayWithAppUser(userId, birthday);
     }
 
     @PutMapping("/{id}")

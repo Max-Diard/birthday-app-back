@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,11 +28,8 @@ public class BirthdayServiceImpl implements BasicService<Birthday> {
     }
 
     public Optional<Birthday> findBirthdayByUserIdAndBirthdayId(Long userId, Long birthdayId) {
-        Optional<AppUser> appUser = userRepository.findById(userId);
-        if (appUser.isPresent()) {
-            return birthdayRepository.findBirthdayByAppUser_IdAndId(appUser.get().getId(), birthdayId);
-        }
-        return null;
+        AppUser appUser = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
+        return birthdayRepository.findBirthdayByAppUser_IdAndId(appUser.getId(), birthdayId);
     }
 
     @Override
@@ -65,11 +63,18 @@ public class BirthdayServiceImpl implements BasicService<Birthday> {
     }
 
     public List<Birthday> findAllBirthdaysByAppUserId(Long id){
-        Optional<AppUser> optionalAppUser = userRepository.findById(id);
-        if(optionalAppUser.isPresent()){
-            return birthdayRepository.findBirthdayByAppUser(optionalAppUser.get());
-        } else {
-            throw new NullPointerException("No user in databases");
+        AppUser appUser = userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found."));
+        return birthdayRepository.findBirthdayByAppUser(appUser);
+    }
+    
+    // TODO for DRY : Ecrire une méthode qui récupère le user et renvoie une 404 s'il n'est pas trouvé
+
+    public ResponseEntity<String> createBirthdayWithAppUser(Long userId, Birthday birthday) {
+        Optional<AppUser> appUser = userRepository.findById(userId);
+        if (appUser.isPresent()) {
+            birthday.setAppUser(appUser.get());
+            return this.create(birthday);
         }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
     }
 }
