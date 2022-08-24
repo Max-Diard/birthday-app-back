@@ -38,7 +38,7 @@ public class UserController {
             return userServiceImpl.create(user);
         } catch (NullPointerException e) {
             System.out.println(e);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("All Fields must be completed.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("All Fields must be completed.");
         }
     }
 

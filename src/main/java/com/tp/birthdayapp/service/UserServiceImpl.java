@@ -17,17 +17,14 @@ public class UserServiceImpl implements BasicService<AppUser> {
     @Autowired
     private UserRepository userRepository;
 
-    public ResponseEntity<String> login(String username, String password) {
-        if (this.findByUsername(username).isPresent()) {
-            if (password.equals(this.findByUsername(username).get().getPassword())) {
-                // C'est que c'est bon
-                return ResponseEntity.status(HttpStatus.OK).body("Authentication success !");
-            } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials !");
+    public AppUser login(String username, String password) throws Exception {
+        Optional<AppUser> appUser = this.findByUsername(username);
+        if (appUser.isPresent()) {
+            if (password.equals(appUser.get().getPassword())) {
+                return appUser.get();
             }
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials !");
         }
+        throw new Exception("Invalid Credentials, sorry dude !");
     }
 
     @Override

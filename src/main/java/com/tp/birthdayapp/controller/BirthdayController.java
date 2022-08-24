@@ -32,7 +32,7 @@ public class BirthdayController {
         try {
             return birthdayServiceImpl.createBirthdayWithAppUser(userId, birthday);
         } catch (NullPointerException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("All Fields must be completed.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("All Fields must be completed.");
         }
     }
 
