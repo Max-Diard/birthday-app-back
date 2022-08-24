@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface BasicService<S> {
 
     List<S> findAll();
-    ResponseEntity<String> create(S entity);
-    ResponseEntity<String> update(S entityToUpdate, S entity);
-    ResponseEntity<String> delete(S entity);
+    S create(S entity) throws Exception;
+    S update(S entityToUpdate, S entity) throws Exception;
+    String delete(S entity) throws Exception;
 }

@@ -5,7 +5,6 @@ import com.tp.birthdayapp.model.Birthday;
 import com.tp.birthdayapp.repository.BirthdayRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -26,30 +25,34 @@ public class BirthdayServiceImpl implements BasicService<Birthday> {
         return birthdayRepository.findAll();
     }
 
-    public Optional<Birthday> findBirthdayByUserIdAndBirthdayId(Long userId, Long birthdayId) {
+    public Birthday findBirthdayByUserIdAndBirthdayId(Long userId, Long birthdayId) throws Exception {
         AppUser appUser = this.userService.getAppUser(userId);
-        return birthdayRepository.findBirthdayByAppUser_IdAndId(appUser.getId(), birthdayId);
+        Optional<Birthday> birthday = birthdayRepository.findBirthdayByAppUser_IdAndId(appUser.getId(), birthdayId);
+        if (birthday.isPresent()) {
+            return birthday.get();
+        }
+        throw new Exception("Birthday not found !");
     }
 
     @Override
-    public ResponseEntity<String> create(Birthday birthday) {
+    public Birthday create(Birthday birthday) {
         birthdayRepository.save(birthday);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Birthday has been created !");
+        return birthday;
     }
 
-    public ResponseEntity<String> updateWithUserIdAndBirthdayId(Long userId, Long birthdayId, Birthday birthday) {
+    public Birthday updateWithUserIdAndBirthdayId(Long userId, Long birthdayId, Birthday birthday) throws Exception {
         AppUser appUser = this.userService.getAppUser(userId);
         Birthday birthdayRepo = this.getBirthdayWithId(birthdayId);
 
         if (birthdayRepo.getAppUser().getId().equals(appUser.getId())) {
             return this.update(birthdayRepo, birthday);
-        } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You can't update this birthday.");
         }
+        throw new Exception("You can't update this birthday.");
+
     }
 
     @Override
-    public ResponseEntity<String> update(Birthday birthdayToUpdate, Birthday birthday) {
+    public Birthday update(Birthday birthdayToUpdate, Birthday birthday) {
         if (birthday.getFirstname() != null) {
             birthdayToUpdate.setFirstname(birthday.getFirstname());
         }
@@ -61,32 +64,31 @@ public class BirthdayServiceImpl implements BasicService<Birthday> {
         }
 
         birthdayRepository.save(birthdayToUpdate);
-        return ResponseEntity.status(HttpStatus.OK).body("Birthday has been updated !");
+        return birthdayToUpdate;
     }
 
-    public ResponseEntity<String> deleteWithUserIdAndBirthdayId(Long userId, Long birthdayId) {
+    public String deleteWithUserIdAndBirthdayId(Long userId, Long birthdayId) throws Exception {
         AppUser appUser = this.userService.getAppUser(userId);
         Birthday birthdayRepo = this.getBirthdayWithId(birthdayId);
 
         if (birthdayRepo.getAppUser().getId().equals(appUser.getId())) {
             return this.delete(birthdayRepo);
-        } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You can't delete this birthday.");
         }
+        throw new Exception("You can't delete this birthday.");
     }
 
     @Override
-    public ResponseEntity<String> delete(Birthday birthday) {
+    public String delete(Birthday birthday) {
         birthdayRepository.delete(birthday);
-        return ResponseEntity.status(HttpStatus.OK).body("Birthday has been deleted !");
+        return "Birthday has been deleted !";
     }
 
-    public List<Birthday> findAllBirthdaysByAppUserId(Long id) {
+    public List<Birthday> findAllBirthdaysByAppUserId(Long id) throws Exception {
         AppUser appUser = this.userService.getAppUser(id);
         return birthdayRepository.findBirthdayByAppUser(appUser);
     }
 
-    public ResponseEntity<String> createBirthdayWithAppUser(Long userId, Birthday birthday) {
+    public Birthday createBirthdayWithAppUser(Long userId, Birthday birthday) throws Exception {
         if (birthday.getFirstname() != null && birthday.getLastname() != null && birthday.getDate() != null) {
             AppUser appUser = this.userService.getAppUser(userId);
             birthday.setAppUser(appUser);

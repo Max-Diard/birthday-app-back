@@ -2,13 +2,13 @@ package com.tp.birthdayapp.controller;
 
 import com.tp.birthdayapp.model.Birthday;
 import com.tp.birthdayapp.service.BirthdayServiceImpl;
+import com.tp.birthdayapp.util.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/users/{userId}/birthdays")
@@ -18,31 +18,52 @@ public class BirthdayController {
     private BirthdayServiceImpl birthdayServiceImpl;
 
     @GetMapping("")
-    public List<Birthday> findAllBirthdaysByAppUserId(@PathVariable Long userId) {
-        return birthdayServiceImpl.findAllBirthdaysByAppUserId(userId);
+    public ResponseEntity<List<Birthday>> findAllBirthdaysByAppUserId(@PathVariable Long userId) {
+        try {
+            List<Birthday> birthdayList = birthdayServiceImpl.findAllBirthdaysByAppUserId(userId);
+            return ResponseEntity.ok(birthdayList);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).headers(Utils.setErrorHeadersRequestResponse(e)).build();
+        }
     }
 
     @GetMapping("/{birthdayId}")
-    public Optional<Birthday> findBirthdayByUserIdAndBirthdayId(@PathVariable Long userId, @PathVariable Long birthdayId) {
-        return birthdayServiceImpl.findBirthdayByUserIdAndBirthdayId(userId, birthdayId);
+    public ResponseEntity<Birthday> findBirthdayByUserIdAndBirthdayId(@PathVariable Long userId, @PathVariable Long birthdayId) {
+        try {
+            Birthday birthday = birthdayServiceImpl.findBirthdayByUserIdAndBirthdayId(userId, birthdayId);
+            return ResponseEntity.ok(birthday);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).headers(Utils.setErrorHeadersRequestResponse(e)).build();
+        }
     }
 
     @PostMapping("")
-    public ResponseEntity<String> createBirthday(@PathVariable Long userId, @RequestBody Birthday birthday) {
+    public ResponseEntity<Birthday> createBirthday(@PathVariable Long userId, @RequestBody Birthday birthday) {
         try {
-            return birthdayServiceImpl.createBirthdayWithAppUser(userId, birthday);
-        } catch (NullPointerException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("All Fields must be completed.");
+            Birthday birthdayCreated = birthdayServiceImpl.createBirthdayWithAppUser(userId, birthday);
+            return ResponseEntity.ok(birthdayCreated);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).headers(Utils.setErrorHeadersRequestResponse(e)).build();
         }
     }
 
     @PutMapping("/{birthdayId}")
-    ResponseEntity<String> updateBirthday(@PathVariable Long userId, @PathVariable Long birthdayId, @RequestBody Birthday birthday) {
-        return birthdayServiceImpl.updateWithUserIdAndBirthdayId(userId, birthdayId, birthday);
+    ResponseEntity<Birthday> updateBirthday(@PathVariable Long userId, @PathVariable Long birthdayId, @RequestBody Birthday birthday) {
+        try {
+            Birthday birthdayUpdated = birthdayServiceImpl.updateWithUserIdAndBirthdayId(userId, birthdayId, birthday);
+            return ResponseEntity.ok(birthdayUpdated);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).headers(Utils.setErrorHeadersRequestResponse(e)).build();
+        }
     }
 
     @DeleteMapping("/{id}")
     ResponseEntity<String> deleteBirthday(@PathVariable Long userId, @PathVariable Long id) {
-        return birthdayServiceImpl.deleteWithUserIdAndBirthdayId(userId, id);
+        try {
+            String response = birthdayServiceImpl.deleteWithUserIdAndBirthdayId(userId, id);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).headers(Utils.setErrorHeadersRequestResponse(e)).build();
+        }
     }
 }
