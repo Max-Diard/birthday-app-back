@@ -23,17 +23,17 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<AppUser> findUserById(@PathVariable Long id) {
+    ResponseEntity<AppUser> findUserById(@PathVariable String id) {
         try {
-            AppUser appUser = userServiceImpl.findByAppUserId(id);
+            AppUser appUser = userServiceImpl.findByAppUserId(Long.parseLong(id));
             return ResponseEntity.ok(appUser);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).headers(Utils.setErrorHeadersRequestResponse(e)).build();
         }
     }
 
-    @GetMapping("/{email}")
-    ResponseEntity<AppUser> findUserById(@PathVariable String email) {
+    @GetMapping("/mail/{email}")
+    ResponseEntity<AppUser> findUserByEmail(@PathVariable String email) {
         try {
             AppUser appUser = userServiceImpl.findByEmail(email);
             return ResponseEntity.ok(appUser);
